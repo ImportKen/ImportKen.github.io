@@ -1,0 +1,293 @@
+<html>
+<head>
+<title>Raster Graphics</title>
+</head>
+<body>
+<div class="toolbar">
+
+    <button onclick="mode='pencil'">✏ Pencil</button>
+    <button onclick="mode='line'">／ Line</button>
+    <button onclick="mode='rectangle'">▭ Rectangle</button>
+    <button onclick="mode='circle'">◯ Circle</button>
+
+    <span>Brush</span>
+    <input type="range" min="1" max="20" value="1"
+           oninput="brushSize=this.value">
+
+    <input type="color" id="colorPicker" value="#ff0000">
+
+    <button onclick="clearCanvas()">🗑 Clear</button>
+
+</div>
+<canvas id="canvas" width="200" height="200"
+style="width:500px; height:500px; border:1px solid #000; image-rendering: pixelated;">
+</canvas>
+
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const imageData = ctx.createImageData(canvas.width, canvas.height);
+const pixels = imageData.data; // Array of color [R,G,B,A, R,G,B,A, ...]
+var brushSize = 1;
+let x1 = 0;
+let y1 = 0;
+let x2 = 0;
+let y2 = 0;
+
+let mode = "pencil"; // pencil หรือ line
+function putPixel(x, y, r, g, b, a = 255) {
+  const idx = (y * canvas.width + x) * 4; // หา index แรกของ pixel (x,y)
+    //add brush size
+  for (let dy = 0; dy < brushSize; dy++) {
+    for (let dx = 0; dx < brushSize; dx++) {
+      const brushIdx = ((y + dy) * canvas.width + (x + dx)) * 4;
+      if (brushIdx >= 0 && brushIdx < pixels.length) {
+        pixels[brushIdx] = r;
+        pixels[brushIdx + 1] = g;
+        pixels[brushIdx + 2] = b;
+        pixels[brushIdx + 3] = a;
+      }
+    }
+  }
+}
+
+function drawLine(x1, y1, x2, y2, r, g, b, a = 255) {
+  const dx = Math.abs(x2 - x1);
+  const dy = Math.abs(y2 - y1);
+
+  if(dx > dy) {
+    const m = (y2 - y1) / (x2 - x1);
+    const c = y1 - m * x1;
+    for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+      const y = Math.round(m * x + c);
+      putPixel(x, y, r, g, b, a);
+    }
+  } else {
+    const m = (x2 - x1) / (y2 - y1);
+    const c = x1 - m * y1;
+    for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+      const x = Math.round(m * y + c);
+      putPixel(x, y, r, g, b, a);
+    }
+  }
+  
+  
+}
+
+function drawRect(x1, y1, x2, y2, r, g, b, a = 255) {
+  drawLine(x1, y1, x2, y1, r, g, b, a); // Top edge
+  drawLine(x2, y1, x2, y2, r, g, b, a); // Right edge
+  drawLine(x2, y2, x1, y2, r, g, b, a); // Bottom edge
+  drawLine(x1, y2, x1, y1, r, g, b, a); // Left edge
+}
+
+function drawRectFilled(x1, y1, x2, y2, r, g, b, a = 255) {
+  for (let y = y1; y <= y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+      putPixel(x, y, r, g, b, a);
+    }
+  }
+}
+
+function drawRectGradient(x1, y1, x2, y2, r1, g1, b1, r2, g2, b2) {
+  for (let y = y1; y <= y2; y++) {
+    const t = (y - y1) / (y2 - y1);
+    const r = Math.round(r1 * (1 - t) + r2 * t);
+    const g = Math.round(g1 * (1 - t) + g2 * t);
+    const b = Math.round(b1 * (1 - t) + b2 * t);
+    for (let x = x1; x <= x2; x++) {
+      putPixel(x, y, r, g, b);
+    }
+  }
+}
+
+function drawEllipse(cx, cy, rx, ry, r, g, b, a = 255) {
+  for (let y = -ry; y <= ry; y++) {
+    for (let x = -rx; x <= rx; x++) {
+      if ((x * x) / (rx * rx) + (y * y) / (ry * ry) <= 1) {
+        putPixel(cx + x, cy + y, r, g, b, a);
+      }
+    }
+  }
+}
+function drawCircle(cx, cy, radius, r, g, b, a = 255) {
+
+    const steps = Math.max(360, radius * 8);
+
+    for (let i = 0; i < steps; i++) {
+
+        const theta = 2 * Math.PI * i / steps;
+
+        const x = Math.round(cx + radius * Math.cos(theta));
+        const y = Math.round(cy + radius * Math.sin(theta));
+
+        putPixel(x, y, r, g, b, a);
+    }
+}
+function drawSprite(sprite, x, y, r, g, b, a = 255) {
+  for (let j = 0; j < sprite.length; j++) {
+    for (let i = 0; i < sprite[j].length; i++) {
+      if (sprite[j][i] === 1) {
+        putPixel(x + i, y + j, r, g, b, a);
+      }
+    }
+  }
+}
+let DrawingLine = false;
+let isDragging = false;
+let lastX=0,lastY=0;
+let r,g,b;
+const spaceInvaderSprite = 
+   [
+    [0, 0, 1, 0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 0, 1, 1, 0, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 0, 0, 1, 0, 1],
+    [0, 1, 0, 1, 1, 0, 1, 0],
+   ];
+const smileSprite = 
+   [
+    [0, 0, 1, 1, 1, 1, 0, 0],
+    [0, 1, 0, 0, 0, 0, 1, 0],
+    [1, 0, 1, 0, 0, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 1, 0, 1],
+    [1, 0, 0, 1, 1, 0, 0, 1],
+    [0, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 1, 1, 1, 1, 0, 0],
+   ];
+function toScaledMousePos(posX, posY) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: Math.floor((posX - rect.left) * scaleX),
+    y: Math.floor((posY - rect.top) * scaleY)
+  };
+}
+   canvas.addEventListener('click', (event) => {
+});
+   canvas.addEventListener('mousedown', (event) => {
+
+    const {x, y} = toScaledMousePos(event.clientX, event.clientY);
+    if (mode === "circle" || mode === "rectangle" || mode === "line") {
+    x1 = x;
+    y1 = y;
+} else if (mode === "pencil") {
+    isDragging = true;
+    lastX = x;
+    lastY = y;
+}
+
+});
+    canvas.addEventListener('mouseup', (event) => {
+
+    const {x, y} = toScaledMousePos(event.clientX, event.clientY);
+    if (mode=== "circle") {
+        drawCircle(x1, y1, Math.round(Math.sqrt((x - x1) ** 2 + (y - y1) ** 2)), r, g, b);
+        //drawEllipse(x1, y1, Math.abs(x - x1), Math.abs(y - y1), r, g, b);
+        ctx.putImageData(imageData, 0, 0);
+    }
+    if (mode === "rectangle") {
+        x2 = x;
+        y2 = y;
+        drawRect(x1, y1, x2, y2, r, g, b);
+        ctx.putImageData(imageData, 0, 0);
+
+    }
+    if (mode === "line") {
+
+        x2 = x;
+        y2 = y;
+
+        drawLine(x1, y1, x2, y2, r, g, b);
+        ctx.putImageData(imageData, 0, 0);
+
+    }
+
+    isDragging = false;
+
+});
+    canvas.addEventListener('mousemove', (event) => {
+
+    if (mode === "pencil" && isDragging) {
+
+        const {x, y} = toScaledMousePos(event.clientX, event.clientY);
+
+        drawLine(lastX, lastY, x, y, r, g, b);
+
+        lastX = x;
+        lastY = y;
+
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+});
+    window.addEventListener('keydown', (event) => {
+
+    if(event.key === '1'){
+        r = 255; g = 0; b = 0;
+    }
+
+    if(event.key === '2'){
+        r = 0; g = 255; b = 0;
+    }
+
+    if(event.key === '3'){
+        r = 0; g = 0; b = 255;
+    }
+
+    if(event.key === '4'){
+        r = 255; g = 255; b = 255;
+    }
+
+    // เพิ่มขนาดแปรง
+    if(event.key === 'q' || event.key === 'Q'){
+        brushSize++;
+        console.log("Brush:", brushSize);
+    }
+
+    // ลดขนาดแปรง
+    if(event.key === 'w' || event.key === 'W'){
+        brushSize = Math.max(1, brushSize - 1);
+        console.log("Brush:", brushSize);
+    }
+
+    // Pencil Mode
+    if(event.key === 'a' || event.key === 'A'){
+        mode = "pencil";
+        console.log("Mode: Pencil");
+    }
+
+    // Line Mode
+    if(event.key === 's' || event.key === 'S'){
+        mode = "line";
+        console.log("Mode: Line");
+    }
+    //circle mode
+    if(event.key === 'd' || event.key === 'D'){
+        mode = "circle";
+        console.log("Mode: Circle");
+    }
+    //rectangle mode
+    if(event.key === 'f' || event.key === 'F'){
+        mode = "rectangle";
+        console.log("Mode: Rectangle");
+    }
+});
+    window.addEventListener('keyup',(event)=>{
+    console.log('Key up:',event.key);
+    })
+
+
+
+
+ctx.putImageData(imageData, 0, 0);
+
+</script>
+</body>
+</html>
