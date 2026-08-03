@@ -96,7 +96,8 @@ const geometry = new THREE.BufferGeometry();
 
         
         const myObj = new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({
-            vertexColors: true
+            //vertexColors: true
+            color: 0x00ff11,
         }));
         myObj.position.set(0, 0, 0);
         myObj.castShadow = true;
