@@ -17,6 +17,38 @@ document.body.appendChild(renderer.domElement);
 
 scene.add(new THREE.AmbientLight(0xffffff, 1.2));
 
+// Street environment GLB - auto-fit around bike
+const pmrem = new THREE.PMREMGenerator(renderer);
+let envScene = null;
+
+function fitEnvironment() {
+  if (!envScene || bike.children.length === 0) return;
+
+  const eSize = new THREE.Box3().setFromObject(envScene).getSize(new THREE.Vector3());
+  const bSize = new THREE.Box3().setFromObject(bike).getSize(new THREE.Vector3());
+  const scale = (Math.max(bSize.x, bSize.z) * 6) / Math.max(eSize.x, eSize.z, eSize.y);
+  envScene.scale.setScalar(scale);
+
+  const box2 = new THREE.Box3().setFromObject(envScene);
+  const c2 = box2.getCenter(new THREE.Vector3());
+  envScene.position.sub(c2);
+  envScene.position.y = -box2.min.y;
+
+  envScene.traverse(o => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = true; } });
+  scene.add(envScene);
+}
+
+new GLTFLoader().load(
+  'https://importken.github.io/dirty_street.glb',
+  gltf => {
+    envScene = gltf.scene;
+    scene.environment = pmrem.fromScene(envScene, 0.04).texture;
+    fitEnvironment();
+  },
+  undefined,
+  e => console.error('Env load error:', e)
+);
+
 // Ring helper
 function makeRing(color) {
   const r = new THREE.Mesh(
@@ -216,9 +248,8 @@ new GLTFLoader().load('https://importken.github.io/h2r.glb', gltf => {
     if (o.isMesh) originals.set(o, o.material);
   });
   bike.add(m);
+  fitEnvironment();
 });
-
-
 
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
