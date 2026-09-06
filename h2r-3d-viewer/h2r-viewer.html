@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H2R 3D Viewer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>KAWASAKI <span>H2R</span></h1>
+    <p class="tag">SUPERSPORT · SUPERCHARGED</p>
+  </header>
+
+  <div id="side">
+    <div class="panel">
+      <h3>FINISH</h3>
+      <button class="btn active" id="origBtn">Showroom Gloss</button>
+      <button class="btn" id="woodBtn">Walnut Wood</button>
+    </div>
+    <div class="panel">
+      <h3>PAINT</h3>
+      <div class="swatches" id="palette"></div>
+    </div>
+    <div class="panel">
+      <h3>SPIN</h3>
+      <input type="range" id="spd" min="0" max="2" step="0.01" value="0.5" />
+    </div>
+    <div class="panel">
+      <h3>LIGHT</h3>
+      <button class="btn active" id="lightBtn">Spotlight: ON</button>
+      <input type="range" id="lightInt" min="0" max="10" step="0.1" value="6" />
+      <div class="swatches" id="lightPalette"></div>
+    </div>
+  </div>
+
+  <div id="info">DRAG · ORBIT &nbsp; • &nbsp; SCROLL · ZOOM</div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

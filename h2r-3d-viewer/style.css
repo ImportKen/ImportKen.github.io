@@ -1,0 +1,86 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  overflow: hidden;
+  background: #0a0c0f;
+  color: #e8eaed;
+  font-family: 'Segoe UI', -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+}
+canvas { display: block; }
+
+/* Header */
+header {
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 28px 36px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none; z-index: 10;
+}
+header h1 {
+  font-size: 30px; font-weight: 800;
+  letter-spacing: 4px; color: #fff;
+}
+header h1 span { color: #35d07f; }
+header .tag {
+  margin-top: 5px; font-size: 11px;
+  letter-spacing: 5px; color: #8a949e;
+  text-transform: uppercase;
+}
+
+/* Side panel */
+#side {
+  position: fixed; right: 24px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 14px;
+  z-index: 10;
+}
+.panel {
+  width: 180px;
+  background: rgba(12,15,22,0.85);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 16px;
+  backdrop-filter: blur(12px);
+}
+.panel h3 {
+  font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #35d07f; margin-bottom: 12px;
+}
+.btn {
+  display: block; width: 100%;
+  margin: 6px 0; padding: 10px;
+  background: rgba(53,208,127,0.1);
+  border: 1px solid rgba(53,208,127,0.25);
+  border-radius: 8px;
+  color: #c9f5e0; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.5px; cursor: pointer;
+  transition: all .2s;
+}
+.btn:hover { background: rgba(53,208,127,0.2); }
+.btn.active {
+  background: #35d07f;
+  border-color: #35d07f;
+  color: #0a0c0f;
+}
+
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.sw {
+  width: 26px; height: 26px; border-radius: 50%;
+  cursor: pointer; border: 2px solid transparent;
+  transition: transform .12s, border-color .12s;
+}
+.sw:hover { transform: scale(1.15); }
+.sw.on { border-color: #fff; transform: scale(1.15); }
+
+input[type="range"] {
+  width: 100%; accent-color: #35d07f;
+}
+
+/* Info bar */
+#info {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; letter-spacing: 2px;
+  color: #5e6770; z-index: 10; pointer-events: none;
+}
