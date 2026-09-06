@@ -218,6 +218,8 @@ new GLTFLoader().load('https://importken.github.io/h2r.glb', gltf => {
   bike.add(m);
 });
 
+
+
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
