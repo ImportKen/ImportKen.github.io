@@ -29,27 +29,28 @@ header .tag {
 
 /* Side panel */
 #side {
-  position: fixed; right: 24px; top: 50%;
-  transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 14px;
-  z-index: 10;
+  position: fixed; right: 24px; top: 10px; bottom: 10px;
+  display: flex; flex-direction: column; gap: 10px;
+  overflow-y: auto; z-index: 10;
+  padding-right: 2px;
 }
 .panel {
   width: 180px;
   background: rgba(12,15,22,0.85);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
-  padding: 16px;
+  padding: 12px;
   backdrop-filter: blur(12px);
+  flex-shrink: 0;
 }
 .panel h3 {
   font-size: 11px; letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #35d07f; margin-bottom: 12px;
+  color: #35d07f; margin-bottom: 10px;
 }
 .btn {
   display: block; width: 100%;
-  margin: 6px 0; padding: 10px;
+  margin: 5px 0; padding: 8px;
   background: rgba(53,208,127,0.1);
   border: 1px solid rgba(53,208,127,0.25);
   border-radius: 8px;
@@ -66,7 +67,7 @@ header .tag {
 
 .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
 .sw {
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 24px; height: 24px; border-radius: 50%;
   cursor: pointer; border: 2px solid transparent;
   transition: transform .12s, border-color .12s;
 }
@@ -75,6 +76,12 @@ header .tag {
 
 input[type="range"] {
   width: 100%; accent-color: #35d07f;
+  margin: 2px 0;
+}
+
+.lbl {
+  display: block; font-size: 10px; letter-spacing: 1px;
+  color: #8a949e; margin: 6px 0 2px; text-transform: uppercase;
 }
 
 /* Info bar */

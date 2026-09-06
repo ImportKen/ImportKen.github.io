@@ -96,6 +96,45 @@ lightColors.forEach(c => {
   lightPalette.appendChild(el);
 });
 
+// Directional light with movable position + color
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+dirLight.position.set(4, 4, 3);
+scene.add(dirLight);
+
+// Visible marker for the directional light position
+const dirMarker = new THREE.Mesh(
+  new THREE.SphereGeometry(0.12, 16, 16),
+  new THREE.MeshBasicMaterial({ color: 0x35d07f })
+);
+scene.add(dirMarker);
+
+const dirX = document.getElementById('dirX');
+const dirY = document.getElementById('dirY');
+const dirZ = document.getElementById('dirZ');
+[dirX, dirY, dirZ].forEach(s => {
+  s.oninput = () => {
+    dirLight.position.set(
+      parseFloat(dirX.value), parseFloat(dirY.value), parseFloat(dirZ.value)
+    );
+    dirMarker.position.copy(dirLight.position);
+  };
+});
+
+const dirColors = [0xffffff, 0xffdd66, 0x6cb4ff, 0xff6666, 0x66ffa0, 0xdd66ff];
+const dirPalette = document.getElementById('dirPalette');
+dirColors.forEach(c => {
+  const el = document.createElement('div');
+  el.className = 'sw' + (c === 0xffffff ? ' on' : '');
+  el.style.background = `#${c.toString(16).padStart(6, '0')}`;
+  el.onclick = () => {
+    dirPalette.querySelectorAll('.sw').forEach(s => s.classList.remove('on'));
+    el.classList.add('on');
+    dirLight.color.set(c);
+    dirMarker.material.color.set(c);
+  };
+  dirPalette.appendChild(el);
+});
+
 // Floor
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(30, 30),
