@@ -86,7 +86,7 @@ export const CAMERA_RIG = {
 };
 
 export const PICKING = {
-  highlightColor: 0xff8c00,
+ //highlightColor: 0xff8c00,
   highlightIntensity: 0.45,
   maxDragPixels: 6, // pointerup beyond this = drag, not click
 };
