@@ -59,6 +59,8 @@ export const PRESETS = {
 
 export const DEMO = {
   enabled: true,
+  /** Fixed world position of the chrome ball; torus + octa stack below it, moon orbits it. */
+  chromeAnchor: [-3.36, 4.76, 2.73],
   torus: { color: 0xff5a3c, glow: 0xff7a1a, glowIntensity: 12, tubeRatio: 0.32, toonSteps: 3 },
   octa: { color: 0x27d7ff, glow: 0x2f7bff, glowIntensity: 10, toonSteps: 4 },
   chrome: { color: 0xcfd6e4, roughness: 0.1, metalness: 0.6, envMapIntensity: 1.2 },
