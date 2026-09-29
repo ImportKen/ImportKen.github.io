@@ -53,22 +53,6 @@ export function createScene(container) {
   return { scene, camera, renderer, controls, sun };
 }
 
-// ------------------------------------------------------------
-// Interior point lights, placed from model bounds after load.
-// Returns { warm, cool } so the UI panel can toggle/recolor/dim.
-// ------------------------------------------------------------
-export function setupRoomLights(scene, center, size) {
-  const warm = new THREE.PointLight(LIGHTS.warm.color, LIGHTS.warm.intensity, 0, LIGHTS.warm.decay);
-  warm.position.set(center.x, center.y + size * LIGHTS.warm.heightFactor, center.z);
-
-  const [ox, oy, oz] = LIGHTS.cool.offsetFactor;
-  const cool = new THREE.PointLight(LIGHTS.cool.color, LIGHTS.cool.intensity, 0, LIGHTS.cool.decay);
-  cool.position.set(center.x + size * ox, center.y + size * oy, center.z + size * oz);
-
-  scene.add(warm, cool);
-  return { warm, cool };
-}
-
 // Fit the sun shadow frustum + position to the loaded model.
 // Without this the default +-5 box clips and creates black patches.
 export function fitSunToModel(sun, center, size) {

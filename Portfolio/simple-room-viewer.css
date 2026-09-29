@@ -1,136 +1,202 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
-html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'VT323', 'Trebuchet MS', monospace; font-size: 18px; }
+/* ============================================================
+   UNDERTALE theme — black boxes, white pixel borders,
+   yellow stats, orange FIGHT buttons, red soul hearts.
+   ============================================================ */
+:root {
+  --black: #000;
+  --ink: #fff;
+  --yellow: #ffe600;
+  --orange: #ff7f27;
+  --red: #f00;
+  --gray: #808080;
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body: 'VT323', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: var(--black);
+  color: var(--ink); font-family: var(--font-body); font-size: 21px;
+}
 #app { width: 100%; height: 100%; }
+#app canvas { display: block; image-rendering: pixelated; }
+
+/* ---------- header : area intro ---------- */
 #page-header {
   position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 10;
-  display: flex; align-items: center; gap: 12px;
-  background: #1d7bf5; border: 3px solid #062144; border-radius: 999px;
-  padding: 8px 22px; box-shadow: 4px 4px 0 #062144;
+  display: flex; align-items: center; gap: 14px;
+  background: var(--black); border: 3px solid var(--ink); border-radius: 4px;
+  padding: 10px 22px;
   pointer-events: none; white-space: nowrap;
 }
-#page-header h1 {
-  margin: 0; font-family: 'Press Start 2P', monospace; font-size: 13px;
-  color: #fff; text-shadow: 2px 2px 0 #062144;
-}
+#page-header::before { content: '♥'; color: var(--red); font-size: 16px; animation: soul-beat 1s ease-in-out infinite; }
+@keyframes soul-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+#page-header h1 { margin: 0; font-family: var(--font-pixel); font-size: 13px; color: var(--ink); }
 #page-header span {
-  font-family: 'Press Start 2P', monospace; font-size: 8px; color: #062144;
-  background: #ffe45e; border: 2px solid #062144; border-radius: 999px;
-  padding: 4px 10px;
+  font-family: var(--font-pixel); font-size: 8px; color: var(--black);
+  background: var(--yellow); border: 2px solid var(--yellow); border-radius: 2px;
+  padding: 5px 9px;
 }
+
+/* ---------- hint : dialogue bar ---------- */
 #hint {
-  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-  color: #fff; background: #1565d8; padding: 8px 20px;
-  border-radius: 999px; font-size: 17px; pointer-events: none;
-  border: 3px solid #062144;
-  box-shadow: 4px 4px 0 #062144; white-space: nowrap;
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 9;
+  width: min(680px, calc(100vw - 32px));
+  color: var(--ink); background: var(--black);
+  border: 3px solid var(--ink); border-radius: 6px;
+  padding: 10px 18px; font-size: 21px;
+  pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
 }
+#hint::before { content: '* '; }
+
+/* ---------- loader : encounter ---------- */
 #loader {
-  position: fixed; inset: 0; display: flex; align-items: center;
-  justify-content: center; color: #fff; background: #1a1a2e; font-size: 20px;
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  background: var(--black); color: var(--ink);
+  font-family: var(--font-pixel); font-size: 13px; text-align: center; line-height: 2;
+  padding: 0 24px;
 }
+#loader::before { content: '♥'; color: var(--red); font-size: 42px; animation: soul-beat 0.8s ease-in-out infinite; }
 #loader.hidden { display: none; }
+
+/* ---------- selection card : enemy info ---------- */
 #pick-info {
-  position: fixed; top: 16px; left: 16px; min-width: 230px; max-width: 300px;
-  color: #fff; background: #1d7bf5; padding: 14px 16px;
-  border-radius: 20px; font-size: 18px; line-height: 1.45; z-index: 10;
-  border: 3px solid #062144;
-  box-shadow: 5px 5px 0 #062144;
+  position: fixed; top: 16px; left: 16px; z-index: 10;
+  min-width: 250px; max-width: 310px;
+  color: var(--ink); background: var(--black);
+  border: 3px solid var(--ink); border-radius: 6px;
+  padding: 14px 16px; font-size: 21px; line-height: 1.5;
 }
 #pick-info.hidden { display: none; }
-#pick-info b {
-  font-family: 'Press Start 2P', monospace; font-size: 10px;
-  background: linear-gradient(90deg, #ffd166, #ff5a8c);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
+#pick-info b { font-family: var(--font-pixel); font-size: 9px; color: var(--yellow); display: block; margin-bottom: 6px; }
 #pick-info button {
-  margin-top: 8px; margin-right: 6px; color: #062144;
-  font-family: 'Press Start 2P', monospace; font-size: 9px;
-  border: 3px solid #062144; background: #ffe45e; padding: 7px 10px;
-  border-radius: 12px; cursor: pointer; box-shadow: 3px 3px 0 #062144;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  margin-top: 10px; margin-right: 8px; padding: 9px 14px 9px 12px;
+  font-family: var(--font-pixel); font-size: 10px; cursor: pointer;
+  border: 3px solid var(--orange); border-radius: 4px;
+  transition: background 0.1s steps(2), color 0.1s steps(2);
 }
-#pick-info button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #062144; }
-#pick-info button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #062144; }
+#deselectBtn { background: var(--black); color: var(--orange); }
+#deselectBtn::before { content: '♥ '; color: var(--red); }
+#focusBtn { background: var(--orange); color: var(--black); }
+#focusBtn::before { content: '♥ '; }
+#pick-info button:hover { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+
+/* ---------- control panel : menu box ---------- */
 #ui-panel {
-  position: fixed; top: 16px; right: 16px; width: 224px;
-  max-height: calc(100vh - 32px); overflow-y: auto; overscroll-behavior: contain;
-  scrollbar-width: thin; scrollbar-color: #ffe45e #0d2a5e;
-  color: #fff; background: #1d7bf5;
-  padding: 16px 16px 14px; border-radius: 22px;
-  font-size: 18px; line-height: 1.5; z-index: 10;
-  border: 3px solid #062144;
-  box-shadow: 6px 6px 0 #062144;
+  position: fixed; top: 16px; right: 16px; z-index: 10;
+  width: 264px; max-height: calc(100vh - 32px); overflow-y: auto; overscroll-behavior: contain;
+  color: var(--ink); background: var(--black);
+  border: 3px solid var(--ink); border-radius: 6px;
+  padding: 16px 18px 14px;
+  scrollbar-width: thin; scrollbar-color: var(--ink) var(--black);
+  transition: transform 0.18s steps(4), opacity 0.18s;
 }
 #ui-panel::-webkit-scrollbar { width: 8px; }
-#ui-panel::-webkit-scrollbar-track { background: #0d2a5e; border-radius: 8px; }
-#ui-panel::-webkit-scrollbar-thumb { background: #ffe45e; border-radius: 8px; border: 2px solid #0d2a5e; }
-#ui-panel { transition: transform 0.3s ease, opacity 0.3s ease; }
-#ui-panel.collapsed { transform: translateX(120%); opacity: 0; pointer-events: none; }
-#ui-panel b {
-  display: block; font-family: 'Press Start 2P', monospace; font-size: 10px;
-  background: linear-gradient(90deg, #ffd166, #ff5a8c);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  margin-bottom: 8px;
-}
-#ui-head { display: flex; align-items: center; justify-content: space-between; }
-#ui-head b { margin-bottom: 0; }
+#ui-panel::-webkit-scrollbar-thumb { background: var(--ink); }
+#ui-panel.collapsed { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+#ui-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+#ui-panel b { display: block; font-family: var(--font-pixel); font-size: 10px; color: var(--ink); }
 #uiCollapse {
-  width: 28px; padding: 0 0 2px; margin: 0; border-radius: 10px;
-  background: #ffe45e; color: #062144; border: 3px solid #062144;
-  box-shadow: 2px 2px 0 #062144; font-size: 15px; font-weight: bold; line-height: 1;
+  width: 32px; height: 32px; margin: 0; padding: 0; border-radius: 4px;
+  background: var(--black); color: var(--ink);
+  border: 3px solid var(--ink); font-size: 16px; line-height: 1; cursor: pointer;
 }
-#ui-panel label { display: flex; align-items: center; gap: 8px; margin: 7px 0; cursor: pointer; color: #fff; }
-#ui-panel label:has(input[type=range]) { display: block; }
-#ui-panel input[type=checkbox] { accent-color: #ffe45e; width: 17px; height: 17px; cursor: pointer; }
+#uiCollapse:hover { background: var(--ink); color: var(--black); }
+
+/* reset = FIGHT */
+#resetView {
+  width: 100%; margin: 12px 0 4px; padding: 12px 0;
+  font-family: var(--font-pixel); font-size: 11px; color: var(--black);
+  background: var(--orange); border: 3px solid var(--orange); border-radius: 4px;
+  cursor: pointer;
+}
+#resetView::before { content: '♥ '; }
+#resetView:hover { background: var(--yellow); border-color: var(--yellow); }
+
+/* section titles = yellow stats */
+.ui-sec {
+  font-family: var(--font-pixel); font-size: 8px; color: var(--yellow);
+  margin: 16px 0 8px; padding-top: 12px;
+  border-top: 3px solid var(--ink);
+}
+
+/* mood chips = ACT menu options, soul marks the active one */
+.ui-chips { display: flex; flex-direction: column; gap: 6px; margin: 2px 0; }
+.ui-chips button {
+  flex: 1; margin: 0; padding: 9px 0 9px 12px; text-align: left;
+  font-family: var(--font-pixel); font-size: 10px; color: var(--ink);
+  background: var(--black); border: 3px solid transparent; border-radius: 4px;
+  cursor: pointer;
+}
+.ui-chips button::before { content: '  '; white-space: pre; }
+.ui-chips button:hover { color: var(--yellow); }
+.ui-chips button.active { border-color: var(--orange); color: var(--yellow); }
+.ui-chips button.active::before { content: '♥ '; color: var(--red); }
+
+/* toggle rows : soul checkbox */
+#ui-panel label { display: flex; align-items: center; gap: 10px; margin: 9px 0; cursor: pointer; font-size: 21px; }
+#ui-panel label:has(input[type=range]) { display: block; margin: 12px 0 4px; }
+#ui-panel input[type=checkbox] {
+  appearance: none; -webkit-appearance: none; flex: none;
+  width: 22px; height: 22px; margin: 0; cursor: pointer;
+  background: var(--black); border: 3px solid var(--ink); border-radius: 3px;
+  display: grid; place-content: center;
+  font-size: 14px; line-height: 1;
+}
+#ui-panel input[type=checkbox]::after { content: ''; }
+#ui-panel input[type=checkbox]:checked::after { content: '♥'; color: var(--red); }
+
+/* sliders : HP bars */
 #ui-panel input[type=range] {
-  width: 100%; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 8px;
-  background: #062144; outline: none; cursor: pointer; margin-top: 4px;
-  border: 2px solid #062144;
+  width: 100%; appearance: none; -webkit-appearance: none;
+  height: 14px; margin-top: 8px; cursor: pointer;
+  background: linear-gradient(90deg, var(--yellow) var(--fill, 50%), #3a0000 var(--fill, 50%));
+  border: 3px solid var(--ink); border-radius: 3px; outline: none;
 }
 #ui-panel input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
-  background: #ffe45e; border: 3px solid #062144; box-shadow: 2px 2px 0 #062144;
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 20px; border-radius: 2px;
+  background: var(--ink); border: none; cursor: pointer;
 }
 #ui-panel input[type=range]::-moz-range-thumb {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: #ffe45e; border: 3px solid #062144; box-shadow: 2px 2px 0 #062144;
+  width: 14px; height: 20px; border-radius: 2px;
+  background: var(--ink); border: none; cursor: pointer;
 }
+#ui-panel label span { margin-left: auto; font-size: 21px; color: var(--yellow); }
+
+/* color rows */
 #ui-panel input[type=color] {
-  margin-left: auto; width: 44px; height: 26px; padding: 0;
-  border: 3px solid #062144; border-radius: 8px; background: #fff; cursor: pointer;
+  margin-left: auto; width: 44px; height: 26px; padding: 0; cursor: pointer;
+  border: 3px solid var(--ink); border-radius: 3px; background: var(--black);
 }
-#ui-panel button {
-  width: 100%; border: 3px solid #062144; padding: 9px 0; border-radius: 13px; cursor: pointer;
-  color: #062144; font-family: 'Press Start 2P', monospace; font-size: 9px; margin-bottom: 10px;
-  background: #ffe45e;
-  box-shadow: 4px 4px 0 #062144;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-#ui-panel button:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #062144; }
-#ui-panel button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #062144; }
-.ui-sec {
-  font-family: 'Press Start 2P', monospace; font-size: 8px;
-  color: #bfe0ff; margin: 10px 0 2px;
-  border-top: 3px dashed rgba(255,255,255,0.4); padding-top: 8px;
-}
-.ui-chips { display: flex; gap: 6px; margin: 6px 0 2px; }
-.ui-chips button {
-  flex: 1; margin: 0; padding: 7px 0; font-size: 8px;
-  background: #fff; color: #062144;
-}
-.ui-chips button.active {
-  background: #062144; color: #ffe45e;
-  box-shadow: 3px 3px 0 #ffe45e;
-}
-#ui-panel label span { margin-left: auto; color: #ffe45e; font-variant-numeric: tabular-nums; text-shadow: 1px 1px 0 #062144; }
+
+/* FAB : spare button */
 #uiFab {
   position: fixed; top: 16px; right: 16px; z-index: 10;
-  width: 46px; height: 46px; border-radius: 50%; border: 3px solid #062144;
-  background: #ffe45e; color: #062144; font-size: 22px; font-weight: bold; cursor: pointer;
-  box-shadow: 4px 4px 0 #062144;
-  transition: transform 0.2s ease;
+  width: 50px; height: 50px; border-radius: 6px; cursor: pointer;
+  background: var(--black); border: 3px solid var(--ink); color: var(--red);
+  font-size: 24px; line-height: 1;
+  transition: background 0.1s steps(2);
 }
-#uiFab:hover { transform: rotate(30deg) scale(1.05); }
+#uiFab:hover { background: var(--ink); }
+#uiFab:hover { color: var(--red); }
 #uiFab.hidden { display: none; }
-#uiFab.hidden { display: none; }
+
+/* ---------- mobile : fullscreen menu ---------- */
+@media (max-width: 640px) {
+  #page-header { top: 10px; padding: 8px 14px; }
+  #page-header h1 { font-size: 10px; }
+  #hint { font-size: 18px; bottom: 12px; }
+  #pick-info { top: 70px; left: 12px; right: 12px; max-width: none; }
+  #ui-panel {
+    top: auto; bottom: 64px; left: 12px; right: 12px; width: auto;
+    max-height: 40vh;
+  }
+  #ui-panel.collapsed { transform: translateY(calc(100% + 20px)); }
+  #uiFab { top: auto; bottom: 12px; right: 12px; }
+}

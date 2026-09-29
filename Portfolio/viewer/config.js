@@ -48,9 +48,6 @@ export const LIGHTS = {
   sun: { color: 0xfff4e6, intensity: 2.6, offsetFactor: [0.5, 0.8, 0.5] },
   // Cool rim from behind for contrast.
   rim: { color: 0x6fb3ff, intensity: 1.1, position: [-6, 3, -5] },
-  // Interior point lights placed from model bounds after load.
-  warm: { color: '#ffc37a', intensity: 60, heightFactor: 0.35, decay: 2 },
-  cool: { color: '#7fb2ff', intensity: 40, offsetFactor: [0.3, 0.12, -0.3], decay: 2 },
 };
 
 // Mood presets for the Day / Sunset / Night chips in the panel.
@@ -98,6 +95,4 @@ export const UI_DEFAULTS = {
   sun: 2.6,
   exposure: 1.1,
   follow: 2.0,
-  warmLevel: 60,
-  coolLevel: 40,
 };

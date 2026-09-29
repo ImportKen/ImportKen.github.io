@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ASSETS, CAMERA, CONTROLS, PRESETS, DEMO } from './config.js';
-import { createScene, setupRoomLights, fitSunToModel } from './scene.js';
+import { createScene, fitSunToModel } from './scene.js';
 import { fixBlackMaterials, applyWoodTexture } from './materials.js';
 import { createCameraRig } from './cameraRig.js';
 import { initPicking } from './picking.js';
@@ -22,7 +22,6 @@ const pickables = [];
 const picking = initPicking({ renderer, camera, rig, pickables });
 
 let demo = null;
-let roomLights = null;
 let followSpeed = CONTROLS.followSpeed;
 let initialView = null;
 
@@ -68,7 +67,6 @@ function onModelLoaded(model) {
   demo = createDemoObjects({ scene, pickables, center, size });
   demo.setDemoVisible(DEMO.enabled);
   demo.setOrbitVisible(DEMO.orbitMoon);
-  roomLights = setupRoomLights(scene, center, size);
 
   loaderEl.classList.add('hidden');
 }
@@ -100,12 +98,6 @@ initUI({
   onSun: (v) => { sun.intensity = v; },
   onExposure: (v) => { renderer.toneMappingExposure = v; },
   onFollow: (v) => { followSpeed = v; },
-  onRoom1: (v) => { if (roomLights) roomLights.warm.visible = v; },
-  onRoom1Color: (v) => { roomLights?.warm.color.set(v); },
-  onRoom1Level: (v) => { if (roomLights) roomLights.warm.intensity = v; },
-  onRoom2: (v) => { if (roomLights) roomLights.cool.visible = v; },
-  onRoom2Color: (v) => { roomLights?.cool.color.set(v); },
-  onRoom2Level: (v) => { if (roomLights) roomLights.cool.intensity = v; },
   onPreset: (name) => {
     const p = PRESETS[name];
     if (!p) return;
