@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import { PICKING } from './config.js';
 
 // ------------------------------------------------------------
-// Object picking: click selects (highlight + info card + zoom),
+// Object picking: click selects (info card + zoom),
 // click again / empty space deselects and flies back.
+// Emissive highlight is gated by PICKING.highlightEnabled.
 // ------------------------------------------------------------
 export function initPicking({ renderer, camera, rig, pickables }) {
   const raycaster = new THREE.Raycaster();
@@ -52,14 +53,16 @@ export function initPicking({ renderer, camera, rig, pickables }) {
 
   function selectObject(obj, hitPoint) {
     obj = resolveMesh(obj);
-    if (!obj?.material?.emissive) return;
-    if (Array.isArray(obj.material)) return; // skip multi-material for simplicity
+    if (!obj?.isMesh) return;
+    if (PICKING.highlightEnabled && (!obj.material?.emissive || Array.isArray(obj.material))) return;
     clearSelection();
-    // Clone per-mesh so the highlight doesn't leak to shared materials.
-    obj.material = obj.material.clone();
-    savedEmissive = { hex: obj.material.emissive.getHex(), intensity: obj.material.emissiveIntensity };
-    obj.material.emissive.setHex(PICKING.highlightColor);
-    obj.material.emissiveIntensity = PICKING.highlightIntensity;
+    if (PICKING.highlightEnabled) {
+      // Clone per-mesh so the highlight doesn't leak to shared materials.
+      obj.material = obj.material.clone();
+      savedEmissive = { hex: obj.material.emissive.getHex(), intensity: obj.material.emissiveIntensity };
+      obj.material.emissive.setHex(PICKING.highlightColor);
+      obj.material.emissiveIntensity = PICKING.highlightIntensity;
+    }
     selected = obj;
     showInfoCard(obj, hitPoint);
   }

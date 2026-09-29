@@ -35,50 +35,16 @@ function makeMoonTexture() {
 }
 
 // ------------------------------------------------------------
-// Extra animated objects: orange torus knot + blue octahedron
-// near the model, chrome ball above them, and a cratered moon
-// orbiting the whole room. All sizes derive from model size.
+// Extra animated objects: chrome ball pinned at DEMO.chromeAnchor,
+// orange torus knot + blue octahedron stacked below it (same +Y
+// direction as before), and a cratered moon orbiting the stack.
+// Sizes still derive from model size.
 // ------------------------------------------------------------
 export function createDemoObjects({ scene, pickables, center, size }) {
   const r = size * DEMO.sizes.torusRadiusFactor;
+  const anchor = new THREE.Vector3(...DEMO.chromeAnchor);
 
-  // --- torus knot ---
-  const torusGroup = new THREE.Group();
-  torusGroup.name = 'CelDemo_TorusKnot';
-  const torusMesh = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(r, r * DEMO.torus.tubeRatio, 120, 20),
-    new THREE.MeshToonMaterial({ color: new THREE.Color(DEMO.torus.color), gradientMap: makeToonGradient(DEMO.torus.toonSteps) }),
-  );
-  torusMesh.castShadow = true;
-  torusMesh.name = 'CelDemo_TorusKnot';
-  addOutline(torusMesh, 1.05);
-  const torusGlow = makeGlow(DEMO.torus.glow, DEMO.torus.glowIntensity);
-  torusGroup.add(torusMesh, torusGlow);
-  const [tx, ty, tz] = DEMO.offsets.torus;
-  torusGroup.position.set(center.x + size * tx, center.y + size * ty, center.z + size * tz);
-  scene.add(torusGroup);
-  pickables.push(torusGroup);
-  const torusBaseY = torusGroup.position.y;
-
-  // --- octahedron floating above the torus ---
-  const octaGroup = new THREE.Group();
-  octaGroup.name = 'CelDemo_Octa';
-  const octaMesh = new THREE.Mesh(
-    new THREE.OctahedronGeometry(r * 0.9, 0),
-    new THREE.MeshToonMaterial({ color: new THREE.Color(DEMO.octa.color), gradientMap: makeToonGradient(DEMO.octa.toonSteps) }),
-  );
-  octaMesh.castShadow = true;
-  octaMesh.name = 'CelDemo_Octa';
-  addOutline(octaMesh, 1.08);
-  const octaGlow = makeGlow(DEMO.octa.glow, DEMO.octa.glowIntensity);
-  octaGroup.add(octaMesh, octaGlow);
-  octaGroup.position.copy(torusGroup.position);
-  octaGroup.position.y += size * DEMO.offsets.octaHeightFactor;
-  scene.add(octaGroup);
-  pickables.push(octaGroup);
-  const octaBaseY = octaGroup.position.y;
-
-  // --- chrome ball at the top of the stack ---
+  // --- chrome ball pinned at the anchor (top of the stack) ---
   const chromeGroup = new THREE.Group();
   chromeGroup.name = 'ChromeBall';
   const chromeMesh = new THREE.Mesh(
@@ -94,10 +60,45 @@ export function createDemoObjects({ scene, pickables, center, size }) {
   chromeMesh.name = 'ChromeBall';
   addOutline(chromeMesh, 1.08);
   chromeGroup.add(chromeMesh);
-  chromeGroup.position.copy(octaGroup.position);
-  chromeGroup.position.y += size * DEMO.offsets.chromeHeightFactor;
+  chromeGroup.position.copy(anchor);
   scene.add(chromeGroup);
   pickables.push(chromeGroup);
+
+  // --- octahedron stacked below the chrome (same +Y direction) ---
+  const octaGroup = new THREE.Group();
+  octaGroup.name = 'CelDemo_Octa';
+  const octaMesh = new THREE.Mesh(
+    new THREE.OctahedronGeometry(r * 0.9, 0),
+    new THREE.MeshToonMaterial({ color: new THREE.Color(DEMO.octa.color), gradientMap: makeToonGradient(DEMO.octa.toonSteps) }),
+  );
+  octaMesh.castShadow = true;
+  octaMesh.name = 'CelDemo_Octa';
+  addOutline(octaMesh, 1.08);
+  const octaGlow = makeGlow(DEMO.octa.glow, DEMO.octa.glowIntensity);
+  octaGroup.add(octaMesh, octaGlow);
+  octaGroup.position.copy(anchor);
+  octaGroup.position.y -= size * DEMO.offsets.chromeHeightFactor;
+  scene.add(octaGroup);
+  pickables.push(octaGroup);
+  const octaBaseY = octaGroup.position.y;
+
+  // --- torus knot stacked below the octa ---
+  const torusGroup = new THREE.Group();
+  torusGroup.name = 'CelDemo_TorusKnot';
+  const torusMesh = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(r, r * DEMO.torus.tubeRatio, 120, 20),
+    new THREE.MeshToonMaterial({ color: new THREE.Color(DEMO.torus.color), gradientMap: makeToonGradient(DEMO.torus.toonSteps) }),
+  );
+  torusMesh.castShadow = true;
+  torusMesh.name = 'CelDemo_TorusKnot';
+  addOutline(torusMesh, 1.05);
+  const torusGlow = makeGlow(DEMO.torus.glow, DEMO.torus.glowIntensity);
+  torusGroup.add(torusMesh, torusGlow);
+  torusGroup.position.copy(octaGroup.position);
+  torusGroup.position.y -= size * DEMO.offsets.octaHeightFactor;
+  scene.add(torusGroup);
+  pickables.push(torusGroup);
+  const torusBaseY = torusGroup.position.y;
 
   // --- orbiting moon ---
   const moonGroup = new THREE.Group();
@@ -111,7 +112,8 @@ export function createDemoObjects({ scene, pickables, center, size }) {
   addOutline(moonMesh, 1.15);
   moonGroup.add(moonMesh, makeGlow(DEMO.moon.lightColor, DEMO.moon.lightIntensity));
   const orbitR = size * DEMO.moon.orbitRadiusFactor;
-  const orbitY = center.y + size * DEMO.offsets.orbitHeightFactor;
+  const orbitCenter = anchor.clone(); // moon orbits the stack, follows the anchor
+  const orbitY = anchor.y + size * DEMO.offsets.orbitHeightFactor;
   scene.add(moonGroup);
   pickables.push(moonGroup);
 
@@ -127,9 +129,9 @@ export function createDemoObjects({ scene, pickables, center, size }) {
     octaGlow.intensity = 8 + Math.sin(time * 3.0 + Math.PI) * 3;
     const a = time * DEMO.moon.orbitSpeed;
     moonGroup.position.set(
-      center.x + Math.cos(a) * orbitR,
+      orbitCenter.x + Math.cos(a) * orbitR,
       orbitY + Math.sin(time * 1.1) * 0.15,
-      center.z + Math.sin(a) * orbitR,
+      orbitCenter.z + Math.sin(a) * orbitR,
     );
     moonGroup.rotation.y = time * 2.0;
   }
