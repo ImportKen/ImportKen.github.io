@@ -4,7 +4,8 @@
 // code (no import cycles).
 //
 // Callbacks: onReset, onRotate, onDemo, onMoon, onSun,
-// onExposure, onFollow, onPreset
+// onExposure, onFollow, onPreset, onRoom1, onRoom1Color,
+// onRoom1Level, onRoom2, onRoom2Color, onRoom2Level
 // ------------------------------------------------------------
 export function initUI(cb) {
   const $ = (id) => document.getElementById(id);
@@ -30,37 +31,33 @@ export function initUI(cb) {
   bindRange('uiSun', 'uiSunVal', cb.onSun, 1);
   bindRange('uiExp', 'uiExpVal', cb.onExposure, 2);
   bindRange('uiFollow', 'uiFollowVal', cb.onFollow, 1);
-  paintAllRanges();
-}
 
-// Paints the filled portion of a range slider (see --fill in CSS).
-function paintRange(el) {
-  const min = parseFloat(el.min || 0);
-  const max = parseFloat(el.max || 100);
-  const pct = ((parseFloat(el.value) - min) / (max - min)) * 100;
-  el.style.setProperty('--fill', `${pct}%`);
-}
+  $('uiRoom1').onchange = (e) => cb.onRoom1(e.target.checked);
+  $('uiRoom1Color').oninput = (e) => cb.onRoom1Color(e.target.value);
+  $('uiRoom1Level').oninput = (e) => setLevel(e.target.value, 'uiRoom1Val', cb.onRoom1Level);
 
-function paintAllRanges() {
-  document.querySelectorAll('#ui-panel input[type=range]').forEach(paintRange);
+  $('uiRoom2').onchange = (e) => cb.onRoom2(e.target.checked);
+  $('uiRoom2Color').oninput = (e) => cb.onRoom2Color(e.target.value);
+  $('uiRoom2Level').oninput = (e) => setLevel(e.target.value, 'uiRoom2Val', cb.onRoom2Level);
 }
 
 function bindRange(inputId, valId, onChange, digits) {
-  const el = document.getElementById(inputId);
-  paintRange(el);
-  el.oninput = (e) => {
+  document.getElementById(inputId).oninput = (e) => {
     const v = parseFloat(e.target.value);
     document.getElementById(valId).textContent = v.toFixed(digits);
-    paintRange(e.target);
     onChange(v);
   };
+}
+
+function setLevel(raw, valId, onChange) {
+  const v = parseFloat(raw);
+  document.getElementById(valId).textContent = v.toFixed(0);
+  onChange(v);
 }
 
 // Called by main.js when a mood preset changes slider-backed
 // values, so the panel always shows the truth.
 export function syncRange(inputId, valId, v, digits = 1) {
-  const el = document.getElementById(inputId);
-  el.value = v;
-  paintRange(el);
+  document.getElementById(inputId).value = v;
   document.getElementById(valId).textContent = Number(v).toFixed(digits);
 }
