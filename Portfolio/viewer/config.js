@@ -8,7 +8,7 @@
 
 export const ASSETS = {
   /** Main .glb model to load (root-relative so every page finds it) */
-  modelUrl: 'https://importken.github.io/KensRoom.glb',
+  modelUrl: 'https://importken.github.io/MyRoom.glb',
   /** Wood diffuse texture applied to the table mesh */
   woodUrl: 'https://importken.github.io/image/wood_table_worn_diff_1k.jpg',
   /** Mesh name (case/punctuation-insensitive) that gets the wood texture */
